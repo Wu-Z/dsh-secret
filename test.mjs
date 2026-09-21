@@ -771,7 +771,7 @@ await checkAsync('notes: stored labels, rename moves value+label, fallbacks, ref
 
   rows = (await service.unset('OPENAI_PROD_KEY')).refs
   assert.deepEqual(rows.map(row => row.name).sort(), ['DB_PASSWORD', 'NEW_KEY'])
-  assert.equal((await readFile(notesPath, 'utf8')).includes('JEV'), false, '删除凭据要同时删说明')
+  assert.equal((await readFile(notesPath, 'utf8')).includes('OPENAI'), false, '删除凭据要同时删说明')
   await rm(dir, { recursive: true, force: true })
 })
 

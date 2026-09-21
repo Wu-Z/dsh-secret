@@ -39,7 +39,7 @@ export const en = {
   'add.title': 'Add',
   'field.name': 'Variable',
   'field.note': 'Chinese label',
-  'field.notePlaceholder': 'e.g. JEV production key (blank = derived)',
+  'field.notePlaceholder': 'e.g. OpenAI production key (blank = derived)',
   'field.value': 'Value',
   'field.valueKeep': 'New value (blank keeps it)',
   'field.namePlaceholder': 'e.g. DB_PASSWORD',
