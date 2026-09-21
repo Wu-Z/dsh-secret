@@ -14,7 +14,7 @@ import * as ReactDom from 'react-dom'
 
 const SECRET = 'hunter2-hunter2'
 const ROWS = [
-  { name: 'VPS_ROOT_PASSWORD', configured: true, source: 'file', writable: true },
+  { name: 'DB_PASSWORD', configured: true, source: 'file', writable: true },
   { name: 'GATEWAY_API_KEY', configured: true, source: 'env', writable: false },
   { name: 'MOONSHOT_API_KEY', configured: false, writable: true },
 ]
@@ -122,9 +122,9 @@ const panel = render([ROWS, '', '', false, '', '', '', null])
 check('the section renders inline (no modal chrome of its own)',
   panel.includes('ds-section') && !panel.includes('ds-backdrop') && !panel.includes('role="dialog"'))
 check('panel lists every stored name as the tooltip, not as visible text',
-  ROWS.every(row => panel.includes(`title="${row.name}"`)) && !panel.includes('>VPS_ROOT_PASSWORD<'))
+  ROWS.every(row => panel.includes(`title="${row.name}"`)) && !panel.includes('>DB_PASSWORD<'))
 check('panel shows a Chinese description per recognized name',
-  panel.includes('VPS root 登录密码') && panel.includes('API 密钥'))
+  panel.includes('DB 的密码') && panel.includes('API 密钥'))
 check('panel badges configured rows', panel.includes('«badge.configured»'))
 check('panel badges a value shadowed by the environment', panel.includes('«badge.readonly»'))
 check('panel never renders a secret value', !panel.includes(SECRET))
@@ -141,7 +141,7 @@ check('panel renders its empty state', empty.includes('«empty»'))
 const failed = render([[], 'boom', '', false, '', '', '', null])
 check('panel renders a remote failure', failed.includes('boom') && failed.includes('role="alert"'))
 
-const editing = render([ROWS, '', '', false, '', '', '', { name: 'VPS_ROOT_PASSWORD', nextName: 'VPS_ROOT_PASSWORD', note: 'VPS root 登录密码', value: 'typed' }])
+const editing = render([ROWS, '', '', false, '', '', '', { name: 'DB_PASSWORD', nextName: 'DB_PASSWORD', note: 'DB 的密码', value: 'typed' }])
 check('editor exposes the name and the label for editing',
   editing.includes('«field.name»') && editing.includes('«field.note»') && editing.includes('«field.valueKeep»'))
 check('panel opens an inline editor for one row', editing.includes('ds-edit') && editing.includes('«cancel»'))

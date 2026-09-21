@@ -3,7 +3,7 @@
  *
  * The store holds names and values only, so neither surface has anything
  * human-readable to show. Descriptions are therefore DERIVED: a small table for
- * the names this machine actually uses, then a suffix rule that turns any other
+ * well-known public services, then a suffix rule that turns any other
  * name into a readable phrase. Nothing here is authoritative — it is a label,
  * never a fact any code relies on, and an unrecognized name yields no label
  * rather than a guess.
@@ -13,10 +13,7 @@
 const KNOWN = {
   DEEPSEEK_API_KEY: 'DeepSeek 平台 API 密钥（模型调用）',
   MOONSHOT_API_KEY: 'Moonshot（月之暗面）API 密钥',
-  JEV_API_KEY: 'JEV 的 API 密钥',
-  VPS_HOST: 'VPS 主机地址',
-  VPS_SSH_USER: 'VPS 的 SSH 登录用户名',
-  VPS_ROOT_PASSWORD: 'VPS root 登录密码',
+  OPENAI_API_KEY: 'OpenAI API 密钥',
 }
 
 /** Suffix → what such a credential holds. First match wins. */
@@ -48,7 +45,7 @@ const SUFFIXES = [
 
 /** Prefix spellings worth capitalizing correctly. */
 const BRANDS = {
-  DEEPSEEK: 'DeepSeek', MOONSHOT: 'Moonshot', JEV: 'JEV', VPS: 'VPS', DSH: 'DSH',
+  DEEPSEEK: 'DeepSeek', MOONSHOT: 'Moonshot', VPS: 'VPS', DSH: 'DSH',
   OPENAI: 'OpenAI', GITHUB: 'GitHub', ANTHROPIC: 'Anthropic', WEIXIN: '微信',
 }
 

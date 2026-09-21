@@ -7,7 +7,7 @@
  * vocabulary out of a file another component owns — and stays hand-editable:
  *
  *   notes:
- *     JEV_API_KEY: JEV 生产环境密钥
+ *     OPENAI_API_KEY: OpenAI 平台密钥
  */
 
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'

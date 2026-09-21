@@ -202,7 +202,7 @@ function runTool(ctx, options) {
       'Run one shell command with a stored secret injected into its environment, and return '
       + 'stdout/stderr/exit code with every occurrence of the secret redacted. The value is never returned '
       + 'and never needs to appear in the conversation: reference it inside the command as $DSH_SECRET or as '
-      + 'the credential\'s own name (e.g. "$VPS_ROOT_PASSWORD"). The first such call in a session asks the '
+      + 'the credential\'s own name (e.g. "$DB_PASSWORD"). The first such call in a session asks the '
       + 'user for approval. Prefer tools that read the secret from the environment (e.g. `sshpass -e` with '
       + 'an inline SSHPASS assignment); never put it in an argv position, where `ps` would expose it.',
     parameters: {
@@ -210,7 +210,7 @@ function runTool(ctx, options) {
       properties: {
         ref: {
           type: 'string',
-          description: 'Credential name, matching [A-Za-z_][A-Za-z0-9_]* — e.g. VPS_ROOT_PASSWORD. Call secret_list for the available names.',
+          description: 'Credential name, matching [A-Za-z_][A-Za-z0-9_]* — e.g. DB_PASSWORD. Call secret_list for the available names.',
         },
         command: {
           type: 'string',

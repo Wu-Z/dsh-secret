@@ -70,7 +70,7 @@ npm test          # 41 host checks + 22 render checks
 - **修改**：变量名 + 中文描述 + 新值（**新值留空**表示只改名字/描述，已存的值不动）
 - **删除**：直接从存储里移除
 
-中文描述存在旁挂文件 `$DSH_HOME/.credentials-notes.yaml`（可手改，格式是 `notes:` 下一行一条）。没写描述时按名字推导（`JEV_API_KEY` → 「JEV 的 API 密钥」），认不出来就不编造，列表退回显示英文名。
+中文描述存在旁挂文件 `$DSH_HOME/.credentials-notes.yaml`（可手改，格式是 `notes:` 下一行一条）。没写描述时按名字推导（`OPENAI_API_KEY` → 「OpenAI API 密钥」），认不出来就不编造，列表退回显示英文名。
 
 值经宿主侧的凭据 seam 写入 `$DSH_HOME/.credentials.yaml`，页面只收到 `{name, configured, source, writable, note}`；**改名由宿主侧完成**（读旧值 → 写新名 → 删旧名 → 搬描述），明文依旧不经过浏览器。
 
@@ -82,8 +82,8 @@ npm test          # 41 host checks + 22 render checks
 cd /path/to/dsh-secret
 
 node cli.mjs list                          # 列出已存的凭据名
-node cli.mjs set VPS_ROOT_PASSWORD         # 新增或修改（隐藏输入，不回显）
-node cli.mjs del VPS_ROOT_PASSWORD         # 删除
+node cli.mjs set DB_PASSWORD         # 新增或修改（隐藏输入，不回显）
+node cli.mjs del DB_PASSWORD         # 删除
 printf '%s' "$PW" | node cli.mjs set NAME --stdin   # 管道用法
 ```
 
@@ -93,9 +93,9 @@ printf '%s' "$PW" | node cli.mjs set NAME --stdin   # 管道用法
 
 > 用我的 VPS 密码看一下磁盘占用
 
-agent 先 `secret_list` 认名字，再 `secret_run({ ref: "VPS_ROOT_PASSWORD", command: "..." })`。**该会话第一次调用**会弹审批，你确认后：
+agent 先 `secret_list` 认名字，再 `secret_run({ ref: "DB_PASSWORD", command: "..." })`。**该会话第一次调用**会弹审批，你确认后：
 
-- 值注入子进程环境，命令里按变量读 —— `$DSH_SECRET`，或凭据自己的名字 `$VPS_ROOT_PASSWORD`
+- 值注入子进程环境，命令里按变量读 —— `$DSH_SECRET`，或凭据自己的名字 `$DB_PASSWORD`
 - 输出里每一处该值替换成 `«已屏蔽»`
 - **同一会话后续调用不再询问**（审批是每会话一次，不是每次）
 
@@ -105,7 +105,7 @@ SSHPASS="$DSH_SECRET" sshpass -e ssh root@host uptime
 PGPASSWORD="$DSH_SECRET" psql -h db -U app
 
 # ✗ 别把变量放进 argv —— ps 能看到
-sshpass -p "$VPS_ROOT_PASSWORD" ssh …
+sshpass -p "$DB_PASSWORD" ssh …
 ```
 
 `secret_list` 不受审批约束（它永远不回值）。没有会话标识的调用（理论上）每次都问。
@@ -140,7 +140,7 @@ dsh plugin --profile web add "link:/path/to/dsh-secret"
       config:
         path: /absolute/store.yaml     # 仅当 provider 的 path 被改过
         approval: never                # 关掉每会话申请（默认 always）
-        allow: [VPS_ROOT_PASSWORD]     # 只允许这些名字，其余拒绝
+        allow: [DB_PASSWORD]     # 只允许这些名字，其余拒绝
 ```
 
 | 字段 | 默认 | 说明 |

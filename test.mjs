@@ -25,7 +25,7 @@ refs:
   MULTILINE_SECRET: |
     first line
     second: line
-  VPS_ROOT_PASSWORD: "${SECRET}"
+  DB_PASSWORD: "${SECRET}"
   SHORT: ab
 
 records:
@@ -127,7 +127,7 @@ check('storePath: DSH_HOME default', () => {
 
 check('parseRefNames: only refs keys, records excluded', () => {
   assert.deepEqual(parseRefNames(STORE), [
-    'DEEPSEEK_API_KEY', 'MULTILINE_SECRET', 'VPS_ROOT_PASSWORD', 'SHORT',
+    'DEEPSEEK_API_KEY', 'MULTILINE_SECRET', 'DB_PASSWORD', 'SHORT',
   ])
 })
 
@@ -220,7 +220,7 @@ await checkAsync('secret_list: reports names and value-free status', async () =>
   await rm(path)
 
   assert.deepEqual(value.refs.map(row => row.name), [
-    'DEEPSEEK_API_KEY', 'MULTILINE_SECRET', 'VPS_ROOT_PASSWORD', 'SHORT',
+    'DEEPSEEK_API_KEY', 'MULTILINE_SECRET', 'DB_PASSWORD', 'SHORT',
   ])
   assert.deepEqual(value.refs[0], { name: 'DEEPSEEK_API_KEY', configured: true, source: 'file', writable: true, note: 'DeepSeek 平台 API 密钥（模型调用）' })
   assert.deepEqual(value.refs[3], { name: 'SHORT', configured: false, writable: false, note: '' })
@@ -257,9 +257,9 @@ await checkAsync('secret_run: injects DSH_SECRET and redacts it from output', as
   })
   apply(ctx, undefined)
   const tool = ctx.registered.find(def => def.name === 'secret_run')
-  const value = await tool.execute({ ref: 'VPS_ROOT_PASSWORD', command: 'echo "$DSH_SECRET"' }, { signal: undefined })
+  const value = await tool.execute({ ref: 'DB_PASSWORD', command: 'echo "$DSH_SECRET"' }, { signal: undefined })
 
-  assert.deepEqual(seen.env, { DSH_SECRET: SECRET, VPS_ROOT_PASSWORD: SECRET })
+  assert.deepEqual(seen.env, { DSH_SECRET: SECRET, DB_PASSWORD: SECRET })
   assert.equal(seen.command, 'echo "$DSH_SECRET"')
   assert.deepEqual(Object.keys(value).sort(), Object.keys(tool.output.schema.properties).sort())
   assert.equal(value.exitCode, 0)
@@ -283,7 +283,7 @@ await checkAsync('secret_run: hands the executor a resolved spec carrying the se
   })
   apply(ctx, undefined)
   const tool = ctx.registered.find(def => def.name === 'secret_run')
-  const value = await tool.execute({ ref: 'VPS_ROOT_PASSWORD', command: 'echo ok' }, { signal: undefined })
+  const value = await tool.execute({ ref: 'DB_PASSWORD', command: 'echo ok' }, { signal: undefined })
 
   assert.equal(value.stdout, 'ok')
   // The executor must receive a resolved spec, and a session confined to
@@ -346,9 +346,9 @@ await checkAsync('approval gate: asks for secret_run, defers every other tool', 
   assert.deepEqual(await gate({ name: 'bash', arguments: {} }, next), { kind: 'allow' })
   assert.equal(delegated, 1)
 
-  const decision = await gate({ name: 'secret_run', arguments: { ref: 'VPS_ROOT_PASSWORD' } }, next)
+  const decision = await gate({ name: 'secret_run', arguments: { ref: 'DB_PASSWORD' } }, next)
   assert.equal(decision.kind, 'ask')
-  assert.equal(decision.reason.includes('VPS_ROOT_PASSWORD'), true)
+  assert.equal(decision.reason.includes('DB_PASSWORD'), true)
   assert.equal(delegated, 1) // an ask is not an allow: nothing ran downstream
 
   const nameless = await gate({ name: 'secret_run', arguments: {} }, next)
@@ -370,7 +370,7 @@ await checkAsync('allowlist: a name outside allow never reaches the credential s
   apply(ctx, { allow: ['ONLY_THIS_ONE'] })
   const tool = ctx.registered.find(def => def.name === 'secret_run')
   await assert.rejects(
-    () => tool.execute({ ref: 'VPS_ROOT_PASSWORD', command: 'true' }, {}),
+    () => tool.execute({ ref: 'DB_PASSWORD', command: 'true' }, {}),
     /不在本插件允许的名字里/,
   )
   assert.equal(resolved, false)
@@ -447,32 +447,32 @@ await checkAsync('cli: set --stdin writes 0600, list reads, del removes', async 
 
   try {
     const secret = "p#ss word 'quoted'"
-    const added = execFileSync(process.execPath, [cli, 'set', 'VPS_ROOT_PASSWORD', '--stdin'], {
+    const added = execFileSync(process.execPath, [cli, 'set', 'DB_PASSWORD', '--stdin'], {
       env, input: `${secret}\n`, encoding: 'utf8',
     })
-    assert.equal(added.includes('已新增 VPS_ROOT_PASSWORD'), true)
+    assert.equal(added.includes('已新增 DB_PASSWORD'), true)
     assert.equal(added.includes(secret), false, 'the CLI must never echo the value back')
 
     const written = await readFileAsync(store, 'utf8')
-    assert.equal(written, "refs:\n  VPS_ROOT_PASSWORD: 'p#ss word ''quoted'''\n")
-    assert.deepEqual(parseRefNames(written), ['VPS_ROOT_PASSWORD'])
+    assert.equal(written, "refs:\n  DB_PASSWORD: 'p#ss word ''quoted'''\n")
+    assert.deepEqual(parseRefNames(written), ['DB_PASSWORD'])
     assert.equal((await statAsync(store)).mode & 0o777, 0o600)
 
-    assert.equal(run('list').includes('VPS_ROOT_PASSWORD'), true)
+    assert.equal(run('list').includes('DB_PASSWORD'), true)
 
     // Re-setting the same name replaces rather than duplicates.
-    execFileSync(process.execPath, [cli, 'set', 'VPS_ROOT_PASSWORD', '--stdin'], {
+    execFileSync(process.execPath, [cli, 'set', 'DB_PASSWORD', '--stdin'], {
       env, input: 'second\n', encoding: 'utf8',
     })
     const replaced = await readFileAsync(store, 'utf8')
-    assert.deepEqual(parseRefNames(replaced), ['VPS_ROOT_PASSWORD'])
+    assert.deepEqual(parseRefNames(replaced), ['DB_PASSWORD'])
     assert.equal(replaced.includes("'second'"), true)
     assert.equal(replaced.includes('quoted'), false)
 
     execFileSync(process.execPath, [cli, 'set', 'SECOND_ONE', '--stdin'], { env, input: 'x\n', encoding: 'utf8' })
-    assert.deepEqual(parseRefNames(await readFileAsync(store, 'utf8')), ['VPS_ROOT_PASSWORD', 'SECOND_ONE'])
+    assert.deepEqual(parseRefNames(await readFileAsync(store, 'utf8')), ['DB_PASSWORD', 'SECOND_ONE'])
 
-    assert.equal(run('del', 'VPS_ROOT_PASSWORD').includes('已删除'), true)
+    assert.equal(run('del', 'DB_PASSWORD').includes('已删除'), true)
     assert.deepEqual(parseRefNames(await readFileAsync(store, 'utf8')), ['SECOND_ONE'])
 
     // Deleting an absent name is a no-op, not an error.
@@ -549,7 +549,7 @@ await checkAsync('approval: asks once per session, then rides on that approval',
   apply(ctx, undefined)
   const gate = ctx.listeners[0].handler
   const tool = ctx.registered.find(definition => definition.name === 'secret_run')
-  const exec = { name: 'secret_run', arguments: { ref: 'VPS_ROOT_PASSWORD' }, agent: { session: { id: 'session-1' } } }
+  const exec = { name: 'secret_run', arguments: { ref: 'DB_PASSWORD' }, agent: { session: { id: 'session-1' } } }
   let delegated = 0
   const next = async () => { delegated += 1; return { kind: 'allow' } }
 
@@ -557,7 +557,7 @@ await checkAsync('approval: asks once per session, then rides on that approval',
   assert.equal(delegated, 0)
 
   // Execution only happens after the approval channel allowed the ask.
-  await tool.execute({ ref: 'VPS_ROOT_PASSWORD', command: 'true' }, exec)
+  await tool.execute({ ref: 'DB_PASSWORD', command: 'true' }, exec)
 
   assert.deepEqual(await gate(exec, next), { kind: 'allow' })
   assert.equal(delegated, 1, 'the approved session does not ask again')
@@ -695,12 +695,12 @@ await checkAsync('the three name lists agree: wire invocations, typert manifest,
 
 await checkAsync('describeRef: known names and suffix rules, no invention', async () => {
   const { describeRef } = await import('./src/shared/notes.js')
-  assert.equal(describeRef('JEV_API_KEY'), 'JEV 的 API 密钥')
-  assert.equal(describeRef('VPS_ROOT_PASSWORD'), 'VPS root 登录密码')
+  assert.equal(describeRef('OPENAI_API_KEY'), 'OpenAI API 密钥')
+  assert.equal(describeRef('DB_PASSWORD'), 'DB 的密码')
   assert.equal(describeRef('MOONSHOT_API_KEY'), 'Moonshot（月之暗面）API 密钥')
   assert.equal(describeRef('FOO_API_KEY'), 'FOO 的 API 密钥')
   assert.equal(describeRef('BAR_BOT_TOKEN'), 'BAR 的机器人令牌')
-  assert.equal(describeRef('OPENAI_API_KEY'), 'OpenAI 的 API 密钥')
+  assert.equal(describeRef('OPENAI_API_KEY'), 'OpenAI API 密钥')
   assert.equal(describeRef('WEIRD'), '', '认不出来的名字不编造说明')
   assert.equal(describeRef(''), '')
 })
@@ -711,15 +711,15 @@ await checkAsync('secret_list: carries the Chinese description into its text', a
   const { join } = await import('node:path')
   const dir = await mkdtemp(join(tmpdir(), 'dsh-secret-note-'))
   const path = join(dir, 'creds.yaml')
-  await writeFile(path, 'version: 1\n\nrefs:\n  VPS_ROOT_PASSWORD: x\n  JEV_API_KEY: y\n  WEIRD: z\n')
+  await writeFile(path, 'version: 1\n\nrefs:\n  DB_PASSWORD: x\n  OPENAI_API_KEY: y\n  WEIRD: z\n')
   const ctx = makeCtx()
   apply(ctx, { path })
   const tool = ctx.registered.find(def => def.name === 'secret_list')
   const value = await tool.execute({}, {})
   const text = tool.output.render({}, value)[0].text
 
-  assert.match(text, /VPS_ROOT_PASSWORD — VPS root 登录密码/)
-  assert.match(text, /JEV_API_KEY — JEV 的 API 密钥/)
+  assert.match(text, /DB_PASSWORD — DB 的密码/)
+  assert.match(text, /OPENAI_API_KEY — OpenAI API 密钥/)
   assert.match(text, /WEIRD · /, '没有说明的名字不留破折号')
   assert.equal(text.includes('x'), false, '列表文本永不包含值')
 })
@@ -732,7 +732,7 @@ await checkAsync('notes: stored labels, rename moves value+label, fallbacks, ref
   const dir = await mkdtemp(join(tmpdir(), 'dsh-secret-notes-'))
   const path = join(dir, 'creds.yaml')
   const notesPath = join(dir, '.credentials-notes.yaml')
-  await writeFile(path, "version: 1\n\nrefs:\n  JEV_API_KEY: 'x'\n  VPS_ROOT_PASSWORD: 'y'\n")
+  await writeFile(path, "version: 1\n\nrefs:\n  OPENAI_API_KEY: 'x'\n  DB_PASSWORD: 'y'\n")
   // A seam that really mutates the file, so the list reflects every write.
   const ctx = makeCtx({
     resolve: async () => ({ value: SECRET, source: 'file' }),
@@ -749,28 +749,28 @@ await checkAsync('notes: stored labels, rename moves value+label, fallbacks, ref
   const service = ctx.provided.secretManager
 
   let rows = (await service.list()).refs
-  assert.equal(rows.find(row => row.name === 'JEV_API_KEY').note, 'JEV 的 API 密钥', '没存说明时用推导')
+  assert.equal(rows.find(row => row.name === 'OPENAI_API_KEY').note, 'OpenAI API 密钥', '没存说明时用推导')
 
-  const tricky = "JEV 生产环境密钥：含空格 与:冒号 和'引号'"
-  rows = (await service.setNote('JEV_API_KEY', tricky)).refs
-  assert.equal(rows.find(row => row.name === 'JEV_API_KEY').note, tricky, '存下的说明必须原样读回')
+  const tricky = "OpenAI 平台密钥：含空格 与:冒号 和'引号'"
+  rows = (await service.setNote('OPENAI_API_KEY', tricky)).refs
+  assert.equal(rows.find(row => row.name === 'OPENAI_API_KEY').note, tricky, '存下的说明必须原样读回')
 
   rows = (await service.set('NEW_KEY', SECRET, '新增时一起写说明')).refs
   assert.equal(rows.find(row => row.name === 'NEW_KEY').note, '新增时一起写说明')
 
-  rows = (await service.rename('JEV_API_KEY', 'JEV_PROD_KEY')).refs
-  assert.deepEqual(rows.map(row => row.name).sort(), ['JEV_PROD_KEY', 'NEW_KEY', 'VPS_ROOT_PASSWORD'])
-  assert.equal(rows.find(row => row.name === 'JEV_PROD_KEY').note, tricky, '改名要带走说明')
+  rows = (await service.rename('OPENAI_API_KEY', 'OPENAI_PROD_KEY')).refs
+  assert.deepEqual(rows.map(row => row.name).sort(), ['DB_PASSWORD', 'NEW_KEY', 'OPENAI_PROD_KEY'])
+  assert.equal(rows.find(row => row.name === 'OPENAI_PROD_KEY').note, tricky, '改名要带走说明')
 
-  rows = (await service.setNote('JEV_PROD_KEY', '')).refs
-  assert.equal(rows.find(row => row.name === 'JEV_PROD_KEY').note, 'JEV PROD 的密钥', '清空说明回落推导')
+  rows = (await service.setNote('OPENAI_PROD_KEY', '')).refs
+  assert.equal(rows.find(row => row.name === 'OPENAI_PROD_KEY').note, 'OpenAI PROD 的密钥', '清空说明回落推导')
 
-  await assert.rejects(() => service.rename('VPS_ROOT_PASSWORD', 'JEV_PROD_KEY'), /已存在/)
+  await assert.rejects(() => service.rename('DB_PASSWORD', 'OPENAI_PROD_KEY'), /已存在/)
   await assert.rejects(() => service.setNote('NOPE', 'x'), /不存在/)
   await assert.rejects(() => service.setNote('bad name', 'x'), /不合法/)
 
-  rows = (await service.unset('JEV_PROD_KEY')).refs
-  assert.deepEqual(rows.map(row => row.name).sort(), ['NEW_KEY', 'VPS_ROOT_PASSWORD'])
+  rows = (await service.unset('OPENAI_PROD_KEY')).refs
+  assert.deepEqual(rows.map(row => row.name).sort(), ['DB_PASSWORD', 'NEW_KEY'])
   assert.equal((await readFile(notesPath, 'utf8')).includes('JEV'), false, '删除凭据要同时删说明')
   await rm(dir, { recursive: true, force: true })
 })

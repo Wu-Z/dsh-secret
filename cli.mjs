@@ -8,9 +8,9 @@
  * and it can only consume a name you already stored.
  *
  *   node cli.mjs list
- *   node cli.mjs set VPS_ROOT_PASSWORD          # hidden prompt
- *   printf '%s' "$PW" | node cli.mjs set VPS_ROOT_PASSWORD --stdin
- *   node cli.mjs del VPS_ROOT_PASSWORD
+ *   node cli.mjs set DB_PASSWORD          # hidden prompt
+ *   printf '%s' "$PW" | node cli.mjs set DB_PASSWORD --stdin
+ *   node cli.mjs del DB_PASSWORD
  *
  * There is deliberately no `get`: printing a secret to a terminal puts it into
  * the shell's scrollback and history. Read the file yourself if you really need
