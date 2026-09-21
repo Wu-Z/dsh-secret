@@ -1,0 +1,73 @@
+{
+  "name": "dsh-secret",
+  "version": "0.2.0",
+  "description": "Password manager for DeepSeek Harness: a sidebar panel and CLI store credentials, and the agent uses one by name after a per-session approval, reading it as an environment variable. The plaintext never enters the conversation.",
+  "type": "module",
+  "main": "lib/index.js",
+  "bin": {
+    "dsh-secret": "./cli.mjs"
+  },
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./typert": {
+      "default": "./lib/typert.host.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
+    }
+  },
+  "files": [
+    "lib",
+    "cli.mjs",
+    "store-edit.mjs",
+    "src/shared",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node test.mjs && node scripts/render-test.mjs"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "credentials",
+    "secrets",
+    "password",
+    "web-ui"
+  ],
+  "license": "MIT",
+  "author": "Wu-Z",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wu-Z/dsh-secret.git"
+  },
+  "homepage": "https://github.com/Wu-Z/dsh-secret#readme",
+  "bugs": {
+    "url": "https://github.com/Wu-Z/dsh-secret/issues"
+  },
+  "engines": {
+    "node": ">=20",
+    "dsh": ">=0.1.6-alpha.1"
+  },
+  "dependencies": {
+    "zod": "4.5.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

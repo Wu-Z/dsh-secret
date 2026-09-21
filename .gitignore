@@ -1,0 +1,6 @@
+node_modules/
+lib/*.map
+*.bak
+*.bak-*
+*.tmp-*
+.DS_Store

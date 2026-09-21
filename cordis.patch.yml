@@ -1,0 +1,6 @@
+# dsh-secret profile patch layer — insert one loader entry for this plugin.
+# The package is host-only (no browser half), so there is nothing for
+# dsh-client-modules to pick up.
+- insert:
+    - id: secret
+      name: 'dsh-secret'
